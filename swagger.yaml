@@ -1,0 +1,206 @@
+swagger: "2.0"
+info:
+  description: "This is Slack Bot Service API documentation."
+  version: "0.0.1"
+  title: "Slack bot service API"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "@"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+paths:
+  /api/v1/slack/service/:
+    post:
+      summary: "サービス起動"
+      description: "サービスを起動します"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Pesroniumのユニットホスト名"
+        required: true
+        schema:
+          type: "string"
+          example: 
+            id: "12345"
+            host: "192.168.33.34"
+            token: "xoxb-xxxx(SlackのAPIトークン)"
+            cell: "HelloCell(Slackからのコールバックを書き込む先のセル)"
+            path: "TestBox/TestCollection/Slackium(Slackからのコールバックを書き込む先のパス（cell含まない）)"
+            username: "test(書き込み先セルへのユーザ名)"
+            password: "書き込み先セルへのパスワード"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          schema:
+            type: "object"
+            properties:
+              result:
+                type: "boolean"
+              id:
+                type: "integer"
+  /api/v1/slack/service/{id}:
+    get:
+      summary: "サービス起動情報取得"
+      description: "サービスの起動情報を取得します"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "取得したいサービスのId"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          schema:
+            type: "object"
+            properties:
+              result:
+                type: "boolean"
+              info: 
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                  state:
+                    type: "boolean"
+                    description: "起動しているかどうか"
+    delete:
+      summary: "サービス削除"
+      description: "起動中のサービスを停止・削除します"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "停止したいサービスのId"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          schema:
+            type: "object"
+            properties:
+              result:
+                type: "boolean"
+              id:
+                type: "string"
+  /api/v1/slack/{id}/users:
+    get:
+      summary: "Slackのユーザ一覧を取得"
+      description: "Slackのユーザ一覧を取得"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "取得したいサービスのId"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          schema:
+            type: "object"
+            properties:
+              result:
+                type: "boolean"
+              info: 
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+                  name:
+                    type: "string"
+                  real_name:
+                    type: "string"
+  /api/v1/slack/{id}/say:
+    post:
+      summary: "Slackbotに発言させる"
+      description: "Slackbotに発言させる"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "発言させるサービスのid"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "body"
+        in: "body"
+        description: "発言させるチャネル"
+        required: true
+        schema:
+          type: "string"
+          example: 
+            channel: "random"
+            message: "テストです"
+            attachments: ""
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          schema:
+            type: "object"
+            properties:
+              result:
+                type: "boolean"
+  /api/v1/slack/{id}/hear:
+    post:
+      summary: "Slackbotに発言を監視させる"
+      description: "Slackbotに発言を監視させ、発言されたらエンティティとして指定したパスにメッセージ情報を書き込む"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "発言させるサービスのid"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "body"
+        in: "body"
+        description: "監視するキー"
+        required: true
+        schema:
+          type: "string"
+          example: 
+            key: "Hello"
+            mention: "direct_message,direct_mention,mention"
+            cell: "HelloCell"
+            path: "TestBox/TestCollection/Slackium"
+            username: "test"
+            password: "piyopiyo"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          schema:
+            type: "object"
+            properties:
+              result:
+                type: "boolean"
+              hear_id:
+                type: "string"
+    delete:
+      summary: "Slackbotの発言監視を停止"
+      description: "Slackbotの発言監視を停止する"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "発言させるサービスのid"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "body"
+        in: "body"
+        description: "監視id"
+        required: true
+        schema:
+          type: "string"
+          example: 
+            hear_id: "abc123"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          schema:
+            type: "object"
+            properties:
+              result:
+                type: "boolean"
+

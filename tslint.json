@@ -1,0 +1,17 @@
+{
+    "rules": {
+        "quotemark": [true, "double", "avoid-escape"],
+        "indent": [true,"spaces"],
+        "no-eval": true,
+        "triple-equals": [true, "allow-null-check"],
+        "class-name": true,
+        "curly": true,
+        "forin": true,
+        "no-var-keyword": true,
+        "no-console": [false, "log"],
+        "no-boolean-literal-compare": false,
+        "strict-boolean-expressions": false,
+        "function-name": false,
+        "align": false
+      }
+  }

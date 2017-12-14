@@ -1,0 +1,20 @@
+{
+    "web": {
+        "port": 7000
+    },
+    "logger": {
+        "Console": {
+            "level": "info",
+            "label": "Slackium",
+            "colorize": "all",
+            "prettyPrint": true,
+            "timestamp": true
+        },
+        "__File": {
+            "filename": "Slackium.log",
+            "level": "info",
+            "label": "Slackium",
+            "json": false
+        }
+    }
+}
