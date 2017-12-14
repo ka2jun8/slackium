@@ -166,7 +166,7 @@ paths:
             cell: "HelloCell"
             path: "TestBox/TestCollection/Slackium"
             username: "test"
-            password: "piyopiyo"
+            password: "password"
       responses:
         200:
           description: "成功時のレスポンス"
