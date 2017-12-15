@@ -2,6 +2,10 @@
     "web": {
         "port": 7000
     },
+    "ssl": {
+        "key": "./key.pem",
+        "cert": "./cert.pem"
+    },
     "logger": {
         "Console": {
             "level": "info",

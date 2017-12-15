@@ -1,4 +1,5 @@
 import * as Http from "http";
+import * as Https from "https";
 import * as Express from "express";
 import { Logger, getLogger } from "../logger";
 import { SlackBotWrapper, SlackUserInfo, SlackCallback } from "./interaction";
@@ -48,7 +49,7 @@ const logger: Logger = getLogger("SlackBot");
 export class BotAPIServer {
     services: SlackBots = {};
 
-    constructor(server: Http.Server, router: Express.Router) {
+    constructor(server: Https.Server|Http.Server, router: Express.Router) {
 
         router.post("/slack/service", (req, res) => {
             logger.info("POST /slack/service : ", req.body);

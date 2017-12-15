@@ -1,6 +1,8 @@
 
 import * as Express from "express";
 import * as Http from "http";
+import * as Https from "https";
+import * as fs from "fs";
 import * as parser from "body-parser";
 import * as swaggerUi from "swagger-ui-express";
 
@@ -16,7 +18,15 @@ export class ExpressServer {
 
     constructor(port: number) {
         const app: Express.Application = Express();
-        const server = Http.createServer(app);
+        let server: Https.Server|Http.Server = null;
+        if(settings.ssl && settings.ssl.key && settings.ssl.cert) {
+            server = Https.createServer({
+                key: fs.readFileSync(settings.ssl.key),
+                cert: fs.readFileSync(settings.ssl.cert),
+            }, app);
+        }else {
+            server = Http.createServer(app);
+        } 
         const router = Router();
 
         app.use(parser.json());
