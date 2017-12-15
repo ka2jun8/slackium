@@ -153,14 +153,31 @@ export class SlackBotWrapper {
      * receive callback info from slack directly
      * @param callbackResult 
      */
-    callback(callbackResult: SlackCallback) {
-        logger.info("callback from slack: ", callbackResult.__id);
-        this.callbackInfoList.push(callbackResult); // TODO サービスからも取得できるようにする
-        this.receiveCallbackClient.post(this.receiveCallbackCell, this.receiveCallbackPath, {raw: JSON.stringify(callbackResult)})
-        .then(()=>{
-            logger.info("stored callback result: ", callbackResult.__id);
-        }).catch((error)=>{
-            logger.error("Error in receiving callback: ", error);
+    postCallback(callbackResult: SlackCallback) {
+        return new Promise<void>((resolve, reject)=>{
+            logger.info("Post callback info: ", callbackResult.__id);
+            this.callbackInfoList.push(callbackResult); 
+            this.receiveCallbackClient.post(this.receiveCallbackCell, this.receiveCallbackPath, {
+                service: this.id,
+                raw: JSON.stringify(callbackResult),
+            })
+            .then(()=>{
+                logger.info("stored callback result: ", callbackResult.__id);
+                resolve();
+            }).catch((error)=>{
+                logger.error("Error in receiving callback: ", error);
+                reject(error);
+            });
+        });
+    }
+
+    /**
+     * get callback info
+     */
+    getCallback() {
+        return new Promise<SlackCallback[]>((resolve, reject)=>{
+            logger.info("Get callback info: ", this.callbackInfoList.length);
+            resolve(this.callbackInfoList);
         });
     }
 
@@ -405,10 +422,13 @@ export class SlackBotWrapper {
             this.controller.hears(req.key, mention, (bot: Botkit.SlackBot, message: Botkit.Message) => {
                 if(this.hearingState[hearId]) {
                     const entity = {
+                        service: this.id,
                         action: message.action,
+                        channelId: message.channel,
                         channel: this.getChannelName(message.channel),
                         text: message.text,
                         user: this.getUserName(message.user),
+                        userId: message.user,
                     }
                     const client: PersoniumClient = new PersoniumClient(this.host);
                     client.login(req.cell, req.username, req.password).then(()=>{

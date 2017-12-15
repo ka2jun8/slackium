@@ -1,7 +1,7 @@
 import * as Http from "http";
 import * as Express from "express";
 import { Logger, getLogger } from "../logger";
-import { SlackBotWrapper, SlackUserInfo } from "./interaction";
+import { SlackBotWrapper, SlackUserInfo, SlackCallback } from "./interaction";
 import {uniqueId} from "../util";
 
 interface Result {
@@ -180,6 +180,38 @@ export class BotAPIServer {
             }        
         });
 
+        router.get("/slack/:id/callback", (req, res) => {
+            const payload: SlackCallback = req.body.parload;
+            logger.info("GET /slack/:id/callback : ", payload);
+
+            const id = req.params.id;
+            const slack = this.dispatchService(id);
+
+            if(slack) {
+                slack.getCallback().then((callbackInfoList)=>{
+                    res.status(200).send({result: true, list: callbackInfoList}).end();
+                }).catch((error)=>{
+                    logger.error(`Error in processing request method=${req.method} path=${req.path}`, error);
+                    res.status(500).send({result: false, error: error}).end();
+                });
+            }else {
+                const error = `service is not instanciation, you call a 'create' method?`;
+                logger.error(`Error in processing request method=${req.method} path=${req.path}`, error);
+                res.status(500).send({result: false, error: error}).end();
+            }        
+        });
+
+        router.post("/slack/callback", (req, res) => {
+            const payload: SlackCallback = req.body.payload;
+            logger.info("POST /slack/callback : ", payload);
+            
+            this.receiveCallback(payload).then(()=>{
+                res.status(200).send("Processing now...").end();
+            }).catch((error)=>{
+                logger.error(`Error in processing request method=${req.method} path=${req.path}`, error);
+                res.status(500).send("I'm sorry, failed...").end();
+            });
+        });
     }
 
     dispatchService(id: string): SlackBotWrapper {
@@ -237,6 +269,23 @@ export class BotAPIServer {
                 delete this.services[id];
             }
             resolve();
+        });
+    }
+
+    receiveCallback(payload: SlackCallback): Promise<void> {
+        return new Promise<void>((resolve, reject)=>{
+            const serviceId = payload.callback_id;
+            const slack = this.dispatchService(serviceId);
+            if(slack){
+                slack.postCallback(payload).then(()=>{
+                    resolve();
+                }).catch((error)=>{
+                    reject(error);
+                });
+            }else {
+                const error = `service is not instanciation, you call a 'create' method?`;
+                reject(error);
+            }
         });
     }
 

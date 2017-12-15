@@ -17,7 +17,7 @@ paths:
       parameters:
       - name: "body"
         in: "body"
-        description: "Pesroniumのユニットホスト名"
+        description: "Service起動情報"
         required: true
         schema:
           type: "string"
@@ -26,7 +26,7 @@ paths:
             host: "192.168.33.34"
             token: "xoxb-xxxx(SlackのAPIトークン)"
             cell: "HelloCell(Slackからのコールバックを書き込む先のセル)"
-            path: "TestBox/TestCollection/Slackium(Slackからのコールバックを書き込む先のパス（cell含まない）)"
+            path: "TestBox/TestCollection/Callback(Slackからのコールバックを書き込む先のパス（cell含まない）)"
             username: "test(書き込み先セルへのユーザ名)"
             password: "書き込み先セルへのパスワード"
       responses:
@@ -203,4 +203,67 @@ paths:
             properties:
               result:
                 type: "boolean"
+  /api/v1/slack/{id}/callback:
+    get:
+      summary: "Slackコールバックを取得"
+      description: "Slack受信したコールバック情報を取得するためのAPI."
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "サービスのid"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          schema:
+            type: "object"
+            example:
+              result: true 
+              list: [{
+                type: "interactive_message",
+                actions: [{"name":"UserCell","type":"button","value":"UserCell"}],
+                callback_id: 12345,
+                team: 
+                  id: "T0X4TR9EE",
+                  domain: "slackany",
+                channel: 
+                  id: "C0X4TRE2W",
+                  name: "random",
+                user: 
+                  id: "U0X4N2GSV",
+                  name: "ka210",
+              }]
+  /api/v1/slack/callback:
+    post:
+      summary: "Slackからコールバックを受け取る"
+      description: "Slackからコールバックを受け取るためのAPI.Slack DevelopersのInteractive ComponentsのRequest URLに登録."
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Slackのコールバック情報"
+        required: true
+        schema:
+          type: "string"
+          example: 
+            payload: 
+              type: "interactive_message"
+              actions: [{"name":"UserCell","type":"button","value":"UserCell"}]
+              callback_id: 12345
+              team: 
+                id: "T0X4TR9EE"
+                domain: "slackany"
+              channel: 
+                id: "C0X4TRE2W"
+                name: "random"
+              user: 
+                id: "U0X4N2GSV"
+                name: "ka210"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          schema:
+            type: "string"
+            example: "Processing now..."
 
