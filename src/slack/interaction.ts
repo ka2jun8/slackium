@@ -351,13 +351,17 @@ export class SlackBotWrapper {
                     logger.info("Failed to start RTM:", err);
                     return setTimeout(this.startSlack.bind(this), 60000);
                 }
-                this.createMap().then(() => {
 
+                this.controller.on("rtm_close", (bot, err) => {
+                    logger.error("Error and slack close: ", err);
+                    setTimeout(this.startSlack.bind(this), 60000);
+                });
+
+                this.createMap().then(() => {
                     // say hi
                     this.controller.hears("hi", ["direct_message", "direct_mention", "mention"], (bot: Botkit.SlackBot, message: Botkit.Message) => {
                         bot.reply(message, "hi");
                     });
-
                     resolve();
                 }).catch((error) => { 
                     logger.error("Error in createMap/settingReply: ", error);
