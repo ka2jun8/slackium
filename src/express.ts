@@ -7,7 +7,7 @@ import * as parser from "body-parser";
 import * as swaggerUi from "swagger-ui-express";
 
 import Router = Express.Router;
-import {BotAPIServer} from "./slack/bot-api";
+import {BotAPIServer} from "./slack/webWorker";
 
 const settings = require("../settings.json");
 const YAML = require("yamljs");
@@ -60,7 +60,7 @@ export class ExpressServer {
     }
 
     dispose() {
-        this.slackbot && this.slackbot.dispose();
+        // this.slackbot && this.slackbot.dispose();
     }
     
 }

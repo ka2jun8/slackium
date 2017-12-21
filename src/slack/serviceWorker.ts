@@ -7,7 +7,8 @@ import { PersoniumClient, PersoniumData, PersoniumAccessToken, PersoniumResponse
 import { slackbot } from "botkit";
 
 import { Logger, getLogger } from "../logger";
-import { HearResuest, SlackBotOption } from "./bot-api";
+import { HearResuest, SlackBotOption, ServiceInfo, Say } from "./webWorker";
+import {ServiceWorkerAction, ServiceWorkerOption, SlackCallback} from "../app";
 import { uniqueId } from "../util";
 
 export interface SlackUserInfo {
@@ -29,52 +30,6 @@ export interface SlackUserInfo {
     is_bot: boolean;
     updated: number;
     is_app_user: boolean;
-}
-
-export interface SlackCallback {
-    __id: string;
-    actions: [
-        {
-            name: string;
-            value: string;
-            type: string;
-        }
-    ],
-    callback_id: string;
-    team: {
-        id: string;
-        domain: string;
-    },
-    channel: {
-        id: string;
-        name: string;
-    },
-    user: {
-        id: string;
-        name: string;
-    },
-    action_ts: string;
-    message_ts: string;
-    attachment_id: string;
-    token: string;
-    original_message: {
-        text: string;
-        attachments: [
-            {
-                title: string;
-                fields: [{
-                    title: string;
-                    value: string;
-                    short: boolean;
-                }],
-                author_name: string;
-                author_icon: string;
-                image_url: string;
-            }
-        ]
-    },
-    response_url: string;
-    trigger_id: string;
 }
 
 export interface SlackChannelInfo {
@@ -110,25 +65,24 @@ export class SlackBotWrapper {
     hearingState: HearingState = {};
     checkMapInterval: NodeJS.Timer = null;
     
-    constructor(id: string, option: SlackBotOption) {
-        this.id = id;
-        this.host = option.host;
-        this.slackToken = option.token;
-        this.state = false;
-        this.receiveCallbackCell = option.cell;
-        this.receiveCallbackUsername = option.username;
-        this.receiveCallbackPassword = option.password;
-        this.receiveCallbackPath = option.path;
-
-        this.receiveCallbackClient = new PersoniumClient(this.host);
-
-        this.controller = Botkit.slackbot({
-            debug: false,
-        });
+    constructor() {
     }
 
-    open(): Promise<void> {
+    open(id: string, option: SlackBotOption): Promise<void> {
         return new Promise<void>((resolve, reject) => {
+            this.id = id;
+            this.host = option.host;
+            this.slackToken = option.token;
+            this.state = false;
+            this.receiveCallbackCell = option.cell;
+            this.receiveCallbackUsername = option.username;
+            this.receiveCallbackPassword = option.password;
+            this.receiveCallbackPath = option.path;
+            this.controller = Botkit.slackbot({
+                debug: false,
+            });
+
+            this.receiveCallbackClient = new PersoniumClient(this.host);
             this.receiveCallbackClient.login(
                 this.receiveCallbackCell, 
                 this.receiveCallbackUsername, 
@@ -452,7 +406,89 @@ export class SlackBotWrapper {
             resolve();
         });
     }
-
-
 }
+
+// forked
+export interface SlackWorkerRequest {
+    action: ServiceWorkerAction;
+    id: string;
+    option: ServiceWorkerOption;
+}
+
+const slack = new SlackBotWrapper();
+process.on("message", (request: SlackWorkerRequest) => {
+    logger.info("Service["+slack.id+"]: request: ", request);
+    if(request.action === "service-open") {
+        const id = request.id;
+        const option: SlackBotOption = request.option as SlackBotOption;
+        slack.open(id, option).then(()=>{
+            process.send({result: true});
+        }).catch((error)=>{
+            logger.error("Error in slack bot interaction [service-open]: ", error);
+            process.send({result: false});
+        });
+    }else if(request.action === "get-service") {
+        const id = slack.id;
+        const state = slack.state;
+        const result: ServiceInfo = {
+            id, 
+            state,
+        };
+        process.send({result: true, body: result});
+//    }else if(request.action === "delete-service") {
+    }else if(request.action === "get-users") {
+        slack.users().then((userInfo:  { [name: string]: SlackUserInfo })=>{
+            process.send({result: true, body: userInfo});
+        }).catch((error)=>{
+            logger.error("Error in slack bot interaction [get-users]: ", error);
+            process.send({result: false});
+        });
+
+    }else if(request.action === "slack-say") {
+        const say: Say = request.option as Say;
+        let attachments = null;
+        if(say.attachments) {
+            attachments = JSON.parse(say.attachments);
+        }
+        slack.say(say.message, say.channel, attachments).then(()=>{
+            process.send({result: true});
+        }).catch((error)=>{
+            logger.error("Error in slack bot interaction [slack-say]: ", error);
+            process.send({result: false});
+        });
+    }else if(request.action === "start-hear") {
+        const option = request.option as HearResuest;
+        slack.startHearing(option).then((hearId)=>{
+            process.send({result: true, body: hearId});
+        }).catch((error)=>{
+            logger.error("Error in slack bot interaction [start-hear]: ", error);
+            process.send({result: false});
+        });        
+    }else if(request.action === "stop-hear") {
+        const option = request.option as any;
+        slack.stopHearing(option.hearId).then(()=>{
+            process.send({result: true});
+        }).catch((error)=>{
+            logger.error("Error in slack bot interaction [stop-hear]: ", error);
+            process.send({result: false});
+        });
+    }else if(request.action === "get-callback") {
+        slack.getCallback().then((callbackInfoList)=>{
+            process.send({result: true, body: callbackInfoList});
+        }).catch((error)=>{
+            logger.error("Error in slack bot interaction [get-callback]: ", error);
+            process.send({result: false});
+        });
+    }else if(request.action === "post-callback") {
+        const option = request.option as SlackCallback;
+        slack.postCallback(option).then(()=>{
+            process.send({result: true});
+        }).catch((error)=>{
+            logger.error("Error in slack bot interaction [post-callback]: ", error);
+            process.send({result: false});
+        });
+    }
+
+});
+
 
