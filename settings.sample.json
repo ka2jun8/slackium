@@ -1,6 +1,7 @@
 {
     "web": {
-        "port": 7000
+        "port": 7000,
+        "timeout": 20000
     },
     "ssl": {
         "key": "./key.pem",
