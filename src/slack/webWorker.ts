@@ -3,41 +3,8 @@ import * as Https from "https";
 import * as Express from "express";
 import { Logger, getLogger } from "../logger";
 import { SlackBotWrapper, SlackUserInfo } from "./serviceWorker";
-import {SlackCallback, Config} from "../app";
+import {SlackCallback, config} from "../app";
 import {uniqueId} from "../util";
-
-let config: Config = null;
-try {
-  config = require("../settings.json");
-}catch(e) {
-  require("dotenv").config();
-  config = {
-    web: {
-      port: Number(process.env.web_port),
-      timeout: Number(process.env.web_timeout),
-    },
-    ssl: {
-        key: process.env.ssl_key,
-        cert: process.env.ssl_cert,
-    },
-    logger: {
-        Console: {
-            level: process.env.console_level, 
-            label: process.env.console_label,
-            colorize: process.env.console_colorize,
-            prettyPrint: process.env.console_prettyPrint === "true",
-            timestamp: process.env.console_timestamp === "true",
-        },
-        __File: {
-            filename: process.env._file_filename,
-            level: process.env._file_level,
-            label: process.env._file_lanel,
-            json: process.env._file_json === "true",
-        }
-    }
-  };
-}
-const responseTimeout = config.web.timeout;
 
 interface Result {
     status: string;
@@ -131,7 +98,7 @@ function requestResponse(action: RequestActionType, id?: string, option?: any): 
             process.removeListener("message", responseHandler);            
             responseHandler = null;
             reject("Reponse timeout");
-        }, responseTimeout);
+        }, config.web.timeout);
 
         process.send({action, id, option});
     });

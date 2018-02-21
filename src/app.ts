@@ -5,8 +5,6 @@ import { SlackBotOption, ServiceInfo, RequestActionType, AtResponse, Say, HearRe
 import { slackbot } from "botkit";
 import { setTimeout } from "timers";
 
-const logger = getLogger("Slackium");
-
 export interface Config {
   web: {
     port: number,
@@ -65,6 +63,7 @@ try {
   };
 }
 
+const logger = getLogger("Slackium");
 logger.debug("set: config: ", config);
 
 const responseTimeout = config.web.timeout;
