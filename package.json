@@ -9,7 +9,7 @@
     "build": "tsc",
     "build:watch": "tsc -w",
     "lint": "tslint --project ./",
-    "heroku-postbuild": "yarn add typescript && tsc -v && tsc"
+    "heroku-postbuild": "yarn add typescript@2.6.2 && tsc -v && tsc"
   },
   "engines": {
     "node": "6.11.3"
