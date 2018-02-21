@@ -9,7 +9,7 @@
     "build": "tsc",
     "build:watch": "tsc -w",
     "lint": "tslint --project ./",
-    "heroku-postbuild": "yarn add typescript && tsc -v && tsc"
+    "heroku-postbuild": "npm install typescript && tsc -v && tsc"
   },
   "dependencies": {
     "botkit": "^0.6.7",
