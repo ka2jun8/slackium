@@ -11,6 +11,9 @@
     "lint": "tslint --project ./",
     "heroku-postbuild": "yarn add typescript && tsc -v && tsc"
   },
+  "engines": {
+    "node": "8.9.4"
+  },
   "dependencies": {
     "botkit": "^0.6.7",
     "dotenv": "^5.0.0",
