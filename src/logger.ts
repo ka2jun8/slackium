@@ -139,7 +139,6 @@ class LoggerForMaster implements Logger {
 
     constructor(label: string = null) {
         this.label = label;
-        console.log("config", config);
         if(typeof config.logger !== "undefined" && config.logger){
             if(config.logger.Console || config.logger.__File){
                 this.logger = getWinstonLoggerInstance();

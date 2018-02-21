@@ -64,7 +64,7 @@ try {
 }
 
 const logger = getLogger("Slackium");
-logger.info("set: config: ", config);
+logger.info("app: config: ", config);
 
 const responseTimeout = config.web.timeout;
 

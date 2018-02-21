@@ -38,6 +38,9 @@ try {
   };
 }
 
+const logger: Logger = getLogger("SlackBot");
+logger.info("webWorker: config: ", config);
+
 interface Result {
     status: string;
     value?: any;
@@ -76,8 +79,6 @@ export interface SlackBotOption {
     password: string;
     path: string;
 }
-
-const logger: Logger = getLogger("SlackBot");
 
 export type RequestActionType = 
     "create-service" 
