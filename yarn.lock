@@ -1600,9 +1600,9 @@ performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
 
-"personium-client@git+https://d043e2f406ce124e9a7d8dd696935b3325d60c14:x-oauth-basic@github.labs.fujitsu.com/personium-dev/personium-client.git#v0.0.4":
-  version "0.0.4"
-  resolved "git+https://d043e2f406ce124e9a7d8dd696935b3325d60c14:x-oauth-basic@github.labs.fujitsu.com/personium-dev/personium-client.git#377990216761848a2dee95675b544eb7858865f0"
+"personium-client@git+https://github.com/ka2jun8/personium-client.git":
+  version "0.0.7"
+  resolved "git+https://github.com/ka2jun8/personium-client.git#f1ac27612094adc11ae9fa6459d6a275e8c5625e"
   dependencies:
     es6-promise "^4.1.1"
     js2xmlparser "^3.0.0"
