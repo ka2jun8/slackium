@@ -65,6 +65,8 @@ try {
   };
 }
 
+logger.debug("set: config: ", config);
+
 const responseTimeout = config.web.timeout;
 
 export interface WorkerRequest {
