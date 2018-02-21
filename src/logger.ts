@@ -9,7 +9,7 @@ try {
   require("dotenv").config();
   config = {
     web: {
-      port: Number(process.env.web_port),
+      port: Number(process.env.PORT || process.env.web_port),
       timeout: Number(process.env.web_timeout),
     },
     ssl: {
