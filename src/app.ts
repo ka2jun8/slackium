@@ -31,7 +31,7 @@ export interface Config {
   }
 }
 
-export let config: Config = null;
+export let config: Config = {} as any;
 try {
   config = require("../settings.json");
 }catch(e) {
@@ -64,7 +64,7 @@ try {
 }
 
 const logger = getLogger("Slackium");
-logger.debug("set: config: ", config);
+logger.info("set: config: ", config);
 
 const responseTimeout = config.web.timeout;
 
