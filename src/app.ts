@@ -38,8 +38,8 @@ try {
   require("dotenv").config();
   config = {
     web: {
-      port: Number(process.env.PORT || process.env.web_port),
-      timeout: Number(process.env.web_timeout),
+      port: Number(process.env.PORT || process.env.web_port || 7000),
+      timeout: Number(process.env.web_timeout || 20000),
     },
     ssl: {
         key: process.env.ssl_key,
@@ -47,16 +47,16 @@ try {
     },
     logger: {
         Console: {
-            level: process.env.console_level, 
-            label: process.env.console_label,
-            colorize: process.env.console_colorize,
+            level: process.env.console_level || "info", 
+            label: process.env.console_label || "Slackium",
+            colorize: process.env.console_colorize || "all",
             prettyPrint: process.env.console_prettyPrint === "true",
             timestamp: process.env.console_timestamp === "true",
         },
         __File: {
-            filename: process.env._file_filename,
-            level: process.env._file_level,
-            label: process.env._file_label,
+            filename: process.env._file_filename || "Slackium.log",
+            level: process.env._file_level || "info",
+            label: process.env._file_label || "Slackium",
             json: process.env._file_json === "true",
         }
     }
