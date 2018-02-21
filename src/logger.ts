@@ -1,6 +1,38 @@
 import * as winston from "winston";
 import {doNothing, stringify} from "./util";
-import {config} from "./app";
+import {Config} from "./app";
+
+let config: Config = {} as any;
+try {
+  config = require("../settings.json");
+}catch(e) {
+  require("dotenv").config();
+  config = {
+    web: {
+      port: Number(process.env.web_port),
+      timeout: Number(process.env.web_timeout),
+    },
+    ssl: {
+        key: process.env.ssl_key,
+        cert: process.env.ssl_cert,
+    },
+    logger: {
+        Console: {
+            level: process.env.console_level, 
+            label: process.env.console_label,
+            colorize: process.env.console_colorize,
+            prettyPrint: process.env.console_prettyPrint === "true",
+            timestamp: process.env.console_timestamp === "true",
+        },
+        __File: {
+            filename: process.env._file_filename,
+            level: process.env._file_level,
+            label: process.env._file_lanel,
+            json: process.env._file_json === "true",
+        }
+    }
+  };
+}
 
 export type LogAction = (message: string, detail?: any)=>void;
 export type LogLevel = "error" | "warn" | "info" | "debug";
@@ -107,6 +139,7 @@ class LoggerForMaster implements Logger {
 
     constructor(label: string = null) {
         this.label = label;
+        console.log("config", config);
         if(typeof config.logger !== "undefined" && config.logger){
             if(config.logger.Console || config.logger.__File){
                 this.logger = getWinstonLoggerInstance();
