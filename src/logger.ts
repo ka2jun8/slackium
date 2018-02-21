@@ -1,6 +1,6 @@
 import * as winston from "winston";
 import {doNothing, stringify} from "./util";
-const Config = require("../settings.json");
+import {config} from "./app";
 
 export type LogAction = (message: string, detail?: any)=>void;
 export type LogLevel = "error" | "warn" | "info" | "debug";
@@ -30,11 +30,11 @@ function getWinstonLoggerInstance(){
     }else{
         logger = new winston.Logger();
         const transports: any[] = [];
-        if(Config.logger.Console){
-            transports.push(new (winston.transports.Console)(Config.logger.Console));
+        if(config.logger.Console){
+            transports.push(new (winston.transports.Console)(config.logger.Console));
         }
-        if(Config.logger.File){
-            transports.push(new (winston.transports.File)(Config.logger.File));
+        if(config.logger.__File){
+            transports.push(new (winston.transports.File)(config.logger.__File));
         }
         logger.configure({ transports: transports });
         return logger;
@@ -107,8 +107,8 @@ class LoggerForMaster implements Logger {
 
     constructor(label: string = null) {
         this.label = label;
-        if(typeof Config.logger !== "undefined" && Config.logger){
-            if(Config.logger.Console || Config.logger.File){
+        if(typeof config.logger !== "undefined" && config.logger){
+            if(config.logger.Console || config.logger.__File){
                 this.logger = getWinstonLoggerInstance();
             }else{
                 this.logger = craeteConsoleLogger() as any;

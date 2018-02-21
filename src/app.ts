@@ -6,8 +6,66 @@ import { slackbot } from "botkit";
 import { setTimeout } from "timers";
 
 const logger = getLogger("Slackium");
-const settings = require("../settings.json");
-const responseTimeout = settings.web.timeout;
+
+export interface Config {
+  web: {
+    port: number,
+    timeout: number,
+  },
+  ssl?: {
+      key: string,
+      cert: string,
+  },
+  logger: {
+      Console: {
+          level: string, 
+          label: string,
+          colorize: string,
+          prettyPrint: boolean,
+          timestamp: boolean,
+      },
+      __File: {
+          filename: string,
+          level: string,
+          label: string,
+          json: boolean,
+      }
+  }
+}
+
+export let config: Config = null;
+try {
+  config = require("../settings.json");
+}catch(e) {
+  require("dotenv").config();
+  config = {
+    web: {
+      port: Number(process.env.web_port),
+      timeout: Number(process.env.web_timeout),
+    },
+    ssl: {
+        key: process.env.ssl_key,
+        cert: process.env.ssl_cert,
+    },
+    logger: {
+        Console: {
+            level: process.env.console_level, 
+            label: process.env.console_label,
+            colorize: process.env.console_colorize,
+            prettyPrint: process.env.console_prettyPrint === "true",
+            timestamp: process.env.console_timestamp === "true",
+        },
+        __File: {
+            filename: process.env._file_filename,
+            level: process.env._file_level,
+            label: process.env._file_lanel,
+            json: process.env._file_json === "true",
+        }
+    }
+  };
+}
+
+const responseTimeout = config.web.timeout;
 
 export interface WorkerRequest {
   action: RequestActionType,
@@ -339,7 +397,7 @@ if (cluster.isMaster) {
 } else {
   //cluster forked childs
   if (process.env.web_process) {
-    const port = settings.web.port || 7000;
+    const port = config.web.port || 7000;
     const express = new ExpressServer(port);
 
     // process.on("exit", (signals) => {

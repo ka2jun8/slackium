@@ -8,8 +8,8 @@ import * as swaggerUi from "swagger-ui-express";
 
 import Router = Express.Router;
 import {BotAPIServer} from "./slack/webWorker";
+import {config} from "./app";
 
-const settings = require("../settings.json");
 const YAML = require("yamljs");
 const swaggerDocument = YAML.load("./swagger.yaml");
 
@@ -19,10 +19,10 @@ export class ExpressServer {
     constructor(port: number) {
         const app: Express.Application = Express();
         let server: Https.Server|Http.Server = null;
-        if(settings.ssl && settings.ssl.key && settings.ssl.cert) {
+        if(config.ssl && config.ssl.key && config.ssl.cert) {
             server = Https.createServer({
-                key: fs.readFileSync(settings.ssl.key),
-                cert: fs.readFileSync(settings.ssl.cert),
+                key: fs.readFileSync(config.ssl.key),
+                cert: fs.readFileSync(config.ssl.cert),
             }, app);
         }else {
             server = Http.createServer(app);

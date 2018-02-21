@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "botkit": "^0.6.7",
+    "dotenv": "^5.0.0",
     "express": "^4.16.2",
     "moment": "^2.19.4",
     "personium-client": "git+https://github.com/ka2jun8/personium-client.git",

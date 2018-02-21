@@ -5,9 +5,9 @@ import { Logger, getLogger } from "../logger";
 import { SlackBotWrapper, SlackUserInfo } from "./serviceWorker";
 import {SlackCallback} from "../app";
 import {uniqueId} from "../util";
+import {config} from "../app";
 
-const settings = require("../../settings");
-const responseTimeout = settings.web.timeout;
+const responseTimeout = config.web.timeout;
 
 interface Result {
     status: string;
