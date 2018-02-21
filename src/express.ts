@@ -8,7 +8,39 @@ import * as swaggerUi from "swagger-ui-express";
 
 import Router = Express.Router;
 import {BotAPIServer} from "./slack/webWorker";
-import {config} from "./app";
+import {Config} from "./app";
+
+let config: Config = {} as any;
+try {
+  config = require("../settings.json");
+}catch(e) {
+  require("dotenv").config();
+  config = {
+    web: {
+      port: Number(process.env.web_port),
+      timeout: Number(process.env.web_timeout),
+    },
+    ssl: {
+        key: process.env.ssl_key,
+        cert: process.env.ssl_cert,
+    },
+    logger: {
+        Console: {
+            level: process.env.console_level, 
+            label: process.env.console_label,
+            colorize: process.env.console_colorize,
+            prettyPrint: process.env.console_prettyPrint === "true",
+            timestamp: process.env.console_timestamp === "true",
+        },
+        __File: {
+            filename: process.env._file_filename,
+            level: process.env._file_level,
+            label: process.env._file_label,
+            json: process.env._file_json === "true",
+        }
+    }
+  };
+}
 
 const YAML = require("yamljs");
 const swaggerDocument = YAML.load("./swagger.yaml");

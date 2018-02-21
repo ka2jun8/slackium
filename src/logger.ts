@@ -27,7 +27,7 @@ try {
         __File: {
             filename: process.env._file_filename,
             level: process.env._file_level,
-            label: process.env._file_lanel,
+            label: process.env._file_label,
             json: process.env._file_json === "true",
         }
     }
