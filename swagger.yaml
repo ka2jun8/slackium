@@ -162,7 +162,7 @@ paths:
           type: "string"
           example: 
             key: "Hello"
-            mention: "direct_message,direct_mention,mention"
+            mention: "message_received,ambient,direct_message,direct_mention,mention"
             cell: "HelloCell"
             path: "TestBox/TestCollection/Slackium"
             username: "test"
@@ -177,7 +177,26 @@ paths:
                 type: "boolean"
               hear_id:
                 type: "string"
-    delete:
+  /api/v1/slack/{id}/hear:
+    get:
+      summary: "Slackbotへ監視させている発言情報一覧の取得"
+      description: "Slackbotへ監視させている発言情報一覧を取得する"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "発言させるサービスのid"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          schema:
+            type: "object"
+            example:
+              result: true 
+              list: []
+  delete:
       summary: "Slackbotの発言監視を停止"
       description: "Slackbotの発言監視を停止する"
       parameters:
