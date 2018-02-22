@@ -481,6 +481,7 @@ process.on("message", (request: SlackWorkerRequest) => {
         });
     }else if(request.action === "post-callback") {
         const option = request.option as SlackCallback;
+        logger.info("ServiceWorker: post-callback from slack: ", {request});
         slack.postCallback(option).then(()=>{
             process.send({result: true});
         }).catch((error)=>{

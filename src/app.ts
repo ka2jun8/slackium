@@ -373,6 +373,7 @@ if (cluster.isMaster) {
       const serviceWorker = dispatchService(id);
       const serviceAction: ServiceWorkerAction = "post-callback";
       const setOption: ServiceWorkerOption = option as SlackCallback;
+      logger.info("App: post-callback from slack: ", {id, option});
       handleServiceMethod(serviceWorker, serviceAction, id, setOption).then((serviceResponse)=>{
         const response: AtResponse = { result: true, body: "Processing now..."};
         webWorker.send(response);

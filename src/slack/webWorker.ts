@@ -259,7 +259,7 @@ export class BotAPIServer {
         router.post("/slack/callback", (req, res) => {
             const payload: SlackCallback = req.body.payload;
             const serviceId = payload.callback_id;
-            logger.info("POST /slack/callback : ", payload);
+            logger.info("POST /slack/callback : ", {serviceId, payload});
 
             requestResponse("post-callback", serviceId, payload).then((response)=>{
                 if(response.result) {
