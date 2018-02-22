@@ -152,27 +152,31 @@ const services: SlackBotWorkerMap = {};
  */
 function handleServiceMethod(serviceWorker: cluster.Worker, action: ServiceWorkerAction, id?: string, option?: any): Promise<ServiceResponse> {
   return new Promise<ServiceResponse>((resolve, reject) => {
-    let responseTimer = null;
+    if(!serviceWorker) {
+      reject("ServiceWorker is undefined.");
+    }else {
+      let responseTimer = null;
 
-    let responseHandler = (response: ServiceResponse) => {
-      serviceWorker.removeListener("message", responseHandler);
-      responseTimer && clearTimeout(responseTimer);
-      responseHandler = null;
-      if (response.result) {
-        resolve(response);
-      } else {
-        reject(response);
-      }
-    };
-    serviceWorker.on("message", responseHandler);
+      let responseHandler = (response: ServiceResponse) => {
+        serviceWorker.removeListener("message", responseHandler);
+        responseTimer && clearTimeout(responseTimer);
+        responseHandler = null;
+        if (response.result) {
+          resolve(response);
+        } else {
+          reject(response);
+        }
+      };
+      serviceWorker.on("message", responseHandler);
 
-    responseTimer = setTimeout(() => {
-      serviceWorker.removeListener("message", responseHandler);
-      responseHandler = null;
-      reject("Reponse timeout");
-    }, responseTimeout);
+      responseTimer = setTimeout(() => {
+        serviceWorker.removeListener("message", responseHandler);
+        responseHandler = null;
+        reject("Reponse timeout");
+      }, responseTimeout);
 
-    serviceWorker.send({ action, id, option });
+      serviceWorker.send({ action, id, option });
+    }
   });
 };
 
