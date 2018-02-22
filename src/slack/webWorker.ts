@@ -257,20 +257,26 @@ export class BotAPIServer {
         });
 
         router.post("/slack/callback", (req, res) => {
-            const payload: SlackCallback = req.body.payload;
-            const serviceId = payload.callback_id;
-            logger.info("POST /slack/callback : ", {serviceId, payload});
+            const payloadStr: string = req.body.payload;
+            try {
+                const payload: SlackCallback = JSON.parse(payloadStr);
+                const serviceId = payload.callback_id;
+                logger.info("POST /slack/callback : ", {serviceId, payload});
 
-            requestResponse("post-callback", serviceId, payload).then((response)=>{
-                if(response.result) {
-                    res.status(200).send("Processing now...").end();
-                }else {
+                requestResponse("post-callback", serviceId, payload).then((response)=>{
+                    if(response.result) {
+                        res.status(200).send("Processing now...").end();
+                    }else {
+                        res.status(500).send("I'm sorry, failed...").end();
+                    }
+                }).catch((error)=>{
+                    logger.error(`Error in processing request method=${req.method} path=${req.path}`, error);
                     res.status(500).send("I'm sorry, failed...").end();
-                }
-            }).catch((error)=>{
-                logger.error(`Error in processing request method=${req.method} path=${req.path}`, error);
+                });
+            }catch(e) {
+                logger.warn("/slack/callback: payload is not json.");
                 res.status(500).send("I'm sorry, failed...").end();
-            });
+            }
         });
     }
 
