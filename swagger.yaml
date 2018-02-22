@@ -144,6 +144,24 @@ paths:
               result:
                 type: "boolean"
   /api/v1/slack/{id}/hear:
+    get:
+      summary: "Slackbotへ監視させている発言情報一覧の取得"
+      description: "Slackbotへ監視させている発言情報一覧を取得する"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "発言させるサービスのid"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          schema:
+            type: "object"
+            example:
+              result: true 
+              list: []
     post:
       summary: "Slackbotに発言を監視させる"
       description: "Slackbotに発言を監視させ、発言されたらエンティティとして指定したパスにメッセージ情報を書き込む"
@@ -177,26 +195,7 @@ paths:
                 type: "boolean"
               hear_id:
                 type: "string"
-  /api/v1/slack/{id}/hear:
-    get:
-      summary: "Slackbotへ監視させている発言情報一覧の取得"
-      description: "Slackbotへ監視させている発言情報一覧を取得する"
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "発言させるサービスのid"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "成功時のレスポンス"
-          schema:
-            type: "object"
-            example:
-              result: true 
-              list: []
-  delete:
+    delete:
       summary: "Slackbotの発言監視を停止"
       description: "Slackbotの発言監視を停止する"
       parameters:
