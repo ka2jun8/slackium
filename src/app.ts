@@ -409,7 +409,7 @@ if (cluster.isMaster) {
     // });
 
   } else if (process.env.service_process) {
-    require("./slack/interaction");
+    require("./slack/serviceWorker");
   }
 
 }
