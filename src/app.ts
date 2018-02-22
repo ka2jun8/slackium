@@ -84,7 +84,8 @@ export type ServiceWorkerAction =
  "start-hear" | 
  "stop-hear" |
  "get-callback" |
- "post-callback"
+ "post-callback" |
+ "get-hear"
  ;
 
  export interface SlackCallback {
@@ -335,6 +336,16 @@ if (cluster.isMaster) {
       const setOption: ServiceWorkerOption = option as Say;
       handleServiceMethod(serviceWorker, serviceAction, id, option).then((serviceResponse)=>{
         const response: AtResponse = { result: true };
+        webWorker.send(response);
+      }).catch((error)=>{
+        webWorker.send(error);
+      });
+
+    } else if (action === "get-hear") {
+      const serviceWorker = dispatchService(id);
+      const serviceAction: ServiceWorkerAction = "get-hear";
+      handleServiceMethod(serviceWorker, serviceAction, id).then((serviceResponse)=>{
+        const response: AtResponse = { result: true, body: serviceResponse.body };
         webWorker.send(response);
       }).catch((error)=>{
         webWorker.send(error);

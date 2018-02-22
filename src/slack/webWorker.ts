@@ -90,6 +90,7 @@ export type RequestActionType =
     | "stop-hear"
     | "get-callback"
     | "post-callback"
+    | "get-hear"
 ;
 
 export type ResponseContent = 
@@ -98,6 +99,7 @@ export type ResponseContent =
     | ServiceInfo[]
     | { [name: string]: SlackUserInfo }
     | SlackCallback[]
+    | {[id: string]: HearResuest}
 ;
 
 export interface AtResponse { 
@@ -200,6 +202,20 @@ export class BotAPIServer {
             const say: Say = req.body;
             requestResponse("slack-say", id, say).then((response)=>{
                 res.status(200).send({result: true}).end();
+            }).catch((error)=>{
+                logger.error(`Error in processing request method=${req.method} path=${req.path}`, error);
+                res.status(500).send({result: false}).end();
+            });
+        });
+
+        router.get("/slack/:id/hear", (req, res) => {
+            logger.info("GET /slack/:id/hear : ", req.body);
+
+            const id = req.params.id;
+
+            requestResponse("get-hear", id).then((response)=>{
+                const hearRequests = response.body as {[id: string]: HearResuest};
+                res.status(200).send({result: true, hears: hearRequests}).end();
             }).catch((error)=>{
                 logger.error(`Error in processing request method=${req.method} path=${req.path}`, error);
                 res.status(500).send({result: false}).end();

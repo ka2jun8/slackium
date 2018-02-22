@@ -406,6 +406,13 @@ export class SlackBotWrapper {
             resolve();
         });
     }
+
+    getHearRequests() {
+        return new Promise<{[id: string]: HearResuest}>((resolve, reject)=>{
+            resolve(this.hearingState);
+        });
+    }
+
 }
 
 // forked
@@ -454,6 +461,13 @@ process.on("message", (request: SlackWorkerRequest) => {
             process.send({result: true});
         }).catch((error)=>{
             logger.error("Error in slack bot interaction [slack-say]: ", error);
+            process.send({result: false});
+        });
+    }else if(request.action === "get-hear") {
+        slack.getHearRequests().then((hearRequests)=>{
+            process.send({result: true, body: hearRequests});
+        }).catch((error)=>{
+            logger.error("Error in slack bot interaction [get-hear]: ", error);
             process.send({result: false});
         });
     }else if(request.action === "start-hear") {
